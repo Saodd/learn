@@ -22,7 +22,7 @@ export class HeroesComponent implements OnInit {
 
 }
 
-interface Hero {
+export interface Hero {
   id: number;
   name: string;
 }
