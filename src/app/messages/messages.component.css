@@ -1,0 +1,17 @@
+h2 {
+  color: red;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: lighter;
+}
+
+button.clear {
+  font-family: Arial, monospace;
+  background-color: #eee;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+button.clear:hover {
+  background-color: #cfd8dc;
+}
