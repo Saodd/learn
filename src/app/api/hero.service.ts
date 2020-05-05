@@ -32,4 +32,9 @@ export class HeroService {
     this.msgService.add('heroes api success.');
     return of(mockHeroes);
   }
+
+  getHero(id: number): Observable<Hero> {
+    this.msgService.add(`hero api {id=${id}} success.`);
+    return of(mockHeroes.find(hero => hero.id === id));
+  }
 }
