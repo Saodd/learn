@@ -1,6 +1,8 @@
 import {Injectable} from '@angular/core';
 import {Observable, of} from 'rxjs';
 import {MessageService} from '../message.service';
+import {HttpClient} from '@angular/common/http';
+import {catchError, tap} from 'rxjs/operators';
 
 export interface Hero {
   id: number;
@@ -13,28 +15,61 @@ const mockHeroes: Hero[] = [
   {id: 13, name: 'Bombasto'},
   {id: 14, name: 'Celeritas'},
   {id: 15, name: 'Magneta'},
-  {id: 16, name: 'RubberMan'},
-  {id: 17, name: 'Dynama'},
-  {id: 18, name: 'Dr IQ'},
-  {id: 19, name: 'Magma'},
-  {id: 20, name: 'Tornado'}
+  {id: 16, name: 'RubberMan'}
 ];
 
 @Injectable({
   providedIn: 'root'
 })
 export class HeroService {
+  private url = 'http://localhost:8000/heroes';
 
-  constructor(public msgService: MessageService) {
+  constructor(public msgService: MessageService, private http: HttpClient) {
   }
 
   getHeroes(): Observable<Hero[]> {
-    this.msgService.add('heroes api success.');
-    return of(mockHeroes);
+    return this.http.get<Hero[]>(this.url).pipe(
+      tap(_ => this.log('fetched heroes')),
+      catchError(this.handleError<Hero[]>([]))
+    );
   }
 
   getHero(id: number): Observable<Hero> {
-    this.msgService.add(`hero api {id=${id}} success.`);
-    return of(mockHeroes.find(hero => hero.id === id));
+    const u = this.url + '/' + id.toString();
+    return this.http.get<Hero>(u).pipe(
+      tap(hero => this.log('fetched hero ' + hero.id)),
+      catchError(this.handleError<Hero>(null))
+    );
+  }
+
+  updateHero(hero: Hero): Observable<any> {
+    return this.http.put(this.url, hero).pipe(
+      tap(_ => this.log('updated hero ' + hero.id)),
+      catchError(this.handleError<Hero>(null))
+    );
+  }
+
+  addHero(hero: Hero): Observable<any> {
+    return this.http.post(this.url, hero).pipe(
+      tap(_ => this.log('add hero ' + hero.name)),
+      catchError(this.handleError<Hero>(null))
+    );
+  }
+
+  deleteHero(hero: Hero): Observable<Hero> {
+    const u = this.url + '/' + hero.id.toString();
+    return this.http.delete<Hero>(u).pipe(
+      catchError(this.handleError<Hero>(null))
+    );
+  }
+
+  private log(message: string) {
+    this.msgService.add(`HeroService: ${message}`);
+  }
+
+  private handleError<T>(result: T) {
+    return (err: any, caught: Observable<T>): Observable<T> => {
+      return of(result as T);
+    };
   }
 }
