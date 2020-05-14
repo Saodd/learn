@@ -1,0 +1,31 @@
+name: Deploy to GitHub Pages via angular-cli-ghpages
+
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the master branch
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Use Node.js 10.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10.x
+
+    - name: Prepare and deploy
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        npm install
+        npm run ng -- deploy --base-href=/learn/ --name="Lewin Lan" --email="lewin.lan.cn@gmail.com" --no-silent
